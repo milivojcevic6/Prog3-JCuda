@@ -1,4 +1,4 @@
-👉 [Scroll up for English version](#jcuda-examples)
+👉 [Scroll down for English version](#jcuda-examples)
 
 
 # JCuda Primeri
