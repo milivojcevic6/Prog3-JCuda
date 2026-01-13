@@ -1,4 +1,134 @@
-# Prog3 JCuda Examples
+👉 [Scroll up for English version](#jcuda-examples)
+
+
+# JCuda Primeri
+
+Ta repozitorij vsebuje **osnovne primere [JCuda](https://javagl.de/jcuda.org/)**, ustvarjene med sledenjem vadnici za razumevanje, kako lahko GPU-je s podporo za CUDA uporabljamo iz Jave. Primeri postopoma napredujejo od preprostega preverjanja delovanja do dejanskih izračunov na GPU-ju in primerjav zmogljivosti s CPU-jem.
+
+Cilji tega repozitorija so:
+
+* Preveriti, ali je **JCuda pravilno nameščena in delujoča**
+* Uporabljati **CUDA knjižnice (JCurand)** iz Jave
+* Write and execute a **custom CUDA kernel** from Java
+* Napisati in zagnati **lastno CUDA jedro (kernel)** iz Jave
+* Primerjati zmogljivost **CPU-ja in GPU-ja**, vključno z vplivom prenosa podatkov
+
+---
+
+## Predpogoji
+
+* NVIDIA GPU s podporo za CUDA
+* Nameščen [CUDA Toolkit](https://developer.nvidia.com/cuda-downloads) (`nvcc` mora biti na voljo v terminalu)
+* Java (priporočeno JDK 8 ali novejši)
+* Pravilno [nastavljene](https://javagl.de/jcuda.org/downloads/downloads.html) JCuda knjižnice
+
+---
+
+## 1. Preverjanje nastavitve JCuda – `Welcome.java`
+
+To je **minimalni test**, s katerim preverimo, da:
+
+* je JCuda pravilno povezana
+* je CUDA runtime dostopen
+* dodeljevanje pomnilnika na GPU-ju deluje
+
+### Kaj program naredi
+
+* Dodeli 4 bajte pomnilnika na GPU-ju z `cudaMalloc`
+* Izpiše naslov kazalca (pointer)
+* Sprosti dodeljeni pomnilnik
+
+Če se program izvede brez napak, **JCuda deluje pravilno**.
+
+---
+
+## 2. Generiranje naključnega polja – `RandomArray.java`
+
+Ta primer prikazuje uporabo knjižnice **[JCurand](https://javagl.de/jcuda.org/jcuda/jcurand/JCurand.html)** za generiranje naključnih števil na GPU-ju ter primerjavo zmogljivosti s CPU implementacijo.
+
+### Kaj program naredi
+
+* Ustvari polje `n` naključnih realnih števil (float)
+* **CPU različica**: zaporedno generiranje naključnih števil
+* **GPU različica**: generiranje naključnih števil z uporabo `JCurand`
+* Izmeri in primerja čas izvajanja obeh pristopov
+
+### Ključni koncepti
+
+* Uporaba **CUDA knjižnic iz Jave**
+* Generiranje naključnih števil na GPU-ju
+* Primerjava zmogljivosti med:
+
+  * CPU (zaporedno)
+  * GPU (vzporedno prek JCuda)
+
+Ta primer pokaže, da GPU ni vedno najboljša izbira: pri majhnih ali trivialnih izračunih lahko režijski stroški uporabe GPU-ja zmanjšajo ali izničijo prednosti v zmogljivosti.
+
+---
+
+## 3. Množenje matrik z lastnim jedrom
+
+Vključene datoteke:
+
+* `MatrixMultiplication.java`
+* `kernel.cu`
+
+To je **najnaprednejši primer** v repozitoriju, ki prikazuje, kako:
+
+* napisati lastno CUDA jedro
+* ga prevesti v PTX obliko
+* ga zagnati iz Jave z uporabo JCuda
+* primerjati zmogljivost CPU-ja in GPU-ja
+
+### Kaj program naredi
+
+* Izvede množenje matrik: **C = A × B**
+* Implementira:
+
+  * CPU različico (zaporedno)
+  * GPU različico (CUDA jedro)
+* Izmeri čas izvajanja v različnih pogojih
+
+### Opazovanja glede zmogljivosti
+
+* Pri velikih matrikah (npr. `n = m = k = 1024`):
+
+  * **GPU je približno 10× hitrejši**, če upoštevamo tudi dodeljevanje in prenos pomnilnika
+  * **GPU je približno 1000× hitrejši**, če primerjamo samo:
+
+    * izvajanje jedra + sinhronizacijo
+    * čas CPU izračuna
+
+To jasno pokaže, da:
+
+* so CUDA jedra izjemno hitra
+* ma prenos podatkov in dodeljevanje pomnilnika velik vpliv
+* so dobitki največji pri **velikih delovnih obremenitvah**
+
+---
+
+## Prevajanjem CUDA jedra
+
+CUDA jedro je zapisano v datoteki `kernel.cu` in ga je pred zagonom Java kode treba prevesti v **PTX** obliko.
+
+### Ukaz za prevajanje
+
+```bash
+nvcc -ptx kernel.cu -o kernel.ptx
+```
+
+Ustvarjena datoteka `kernel.ptx` se nato naloži v razredu `MatrixMultiplication.java` med izvajanjem.
+
+---
+
+## Opombe
+
+* Zmogljivost je močno odvisna od modela GPU-ja in konfiguracije sistema
+* Pri majhnih vhodnih podatkih se rezultati razlikujejo zaradi režijskih stroškov
+* Primeri so namenjeni **izobraževalnim namenom**
+
+
+# JCuda Examples
 
 This repository contains **basic [JCuda](https://javagl.de/jcuda.org/) examples** created while following a tutorial to understand how **CUDA-enabled GPUs can be used from Java**. The examples progress from a simple sanity check to real GPU computation and performance comparison with CPU implementations.
 
